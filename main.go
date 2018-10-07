@@ -3,24 +3,23 @@ package main
 /* vim: set ts=2 sw=2 sts=2 ff=unix ft=go noet: */
 
 import (
+	"bufio"
+	"fmt"
 	"net"
 	"os"
-	"time"
-	"bufio"
-	"strings"
-	"strconv"
-	"fmt"
 	"os/exec"
+	"strconv"
+	"strings"
+	"time"
 
-  "github.com/sirupsen/logrus"
-//  "github.com/skillcoder/homer/shutdown"
+	"github.com/sirupsen/logrus"
 )
 
 var log = logrus.New()
 var reason string
 
 func init() {
-//    log.SetLevel(logrus.DebugLevel)
+	//log.SetLevel(logrus.DebugLevel)
 }
 
 func makeTimestamp() int64 {
@@ -35,9 +34,8 @@ func AlarmConnection() {
 	log.Warnf("AlarmConnection reason: %s", reason)
 	say := "lost.mp3"
 	if reason == "EOF" {
-		 say = "server_lost.mp3"
+		say = "server_lost.mp3"
 	}
-	// read tcp 192.168.100.254:19054->34.200.135.24:8888: i/o timeout
 
 	cmd := exec.Command("mplayer", say)
 	log.Infof("mplayer %s", say)
@@ -79,8 +77,7 @@ func main() {
 
 	bufReader := bufio.NewReader(conn)
 	bufWriter := bufio.NewWriter(conn)
-	//buff := make([]byte, 0, 9)
-  var ts int64
+	var ts int64
 	for {
 		ts = makeTimestamp()
 		_, err = fmt.Fprintf(bufWriter, "%d\n", ts)
@@ -116,6 +113,6 @@ func main() {
 			log.Infof("[%s] Slow detected: %dms", dateString(), diffMs)
 		}
 
-		time.Sleep(500 * time.Millisecond);
+		time.Sleep(500 * time.Millisecond)
 	}
 }
