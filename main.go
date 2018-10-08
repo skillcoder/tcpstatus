@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"regexp"
 
 	"github.com/sirupsen/logrus"
 )
@@ -35,6 +36,8 @@ func AlarmConnection() {
 	say := "lost.mp3"
 	if reason == "EOF" {
 		say = "server_lost.mp3"
+	} else if matched, _ := regexp.MatchString(`^read tcp .+: i/o timeout$`, reason); matched {
+		say = "connection_lost.mp3"
 	}
 
 	cmd := exec.Command("mplayer", say)
@@ -53,7 +56,7 @@ func main() {
 		log.Fatal("Required env parameter TCPING_ADDR [host:port] is not set")
 	}
 
-	timeoutDuration := 2000 * time.Millisecond
+	timeoutDuration := 2500 * time.Millisecond
 	slowDetectionMS := 138
 	lagDetectionMS := 400
 
