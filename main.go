@@ -32,8 +32,8 @@ func dateString() string {
 	return time.Now().Format("2 15:04:05")
 }
 
-func AlarmConnection() {
-	log.Warnf("AlarmConnection reason: %s", reason)
+func alarmConnection() {
+	log.Warnf("alarmConnection reason: %s", reason)
 	say := "lost.mp3"
 	if reason == "EOF" {
 		say = "server_lost.mp3"
@@ -42,8 +42,6 @@ func AlarmConnection() {
 	}
 
 	playSound(say)
-
-	os.Exit(2)
 }
 
 func playSound(name string) {
@@ -51,7 +49,7 @@ func playSound(name string) {
 	log.Infof("mplayer %s", name)
 	err := cmd.Run()
 	if err != nil {
-		log.Errorf("Error in run player: $v", err)
+		log.Errorf("Error in run player: %v", err)
 	}
 }
 
@@ -88,7 +86,7 @@ func monitor(tcpAddr *net.TCPAddr) {
 	defer func() {
 		log.Info("Disconnect")
 		conn.Close()
-		AlarmConnection()
+		alarmConnection()
 	}()
 
 	bufReader := bufio.NewReader(conn)
