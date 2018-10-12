@@ -85,7 +85,10 @@ func monitor(tcpAddr *net.TCPAddr) {
 
 	defer func() {
 		log.Info("Disconnect")
-		conn.Close()
+		err := conn.Close()
+		if err != nil {
+			log.Errorf("Cant close conn: %v", err)
+		}
 		alarmConnection()
 	}()
 
@@ -101,9 +104,17 @@ func monitor(tcpAddr *net.TCPAddr) {
 			break
 		}
 
-		bufWriter.Flush()
+		err = bufWriter.Flush()
+		if err != nil {
+      log.Errorf("Cant flush bufWriter: %v", err)
+    }
+
 		log.Debugf(">%d", ts)
-		conn.SetReadDeadline(time.Now().Add(timeoutDuration))
+		err = conn.SetReadDeadline(time.Now().Add(timeoutDuration))
+		if err != nil {
+      log.Errorf("Cant SetReadDeadline: %v", err)
+    }
+
 		netData, err := bufReader.ReadString('\n')
 		if err != nil {
 			log.Errorf("Read ERROR: [%s]", err.Error())
