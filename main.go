@@ -37,8 +37,15 @@ func alarmConnection() {
 	say := "lost.mp3"
 	if reason == "EOF" {
 		say = "server_lost.mp3"
-	} else if matched, _ := regexp.MatchString(`^read tcp .+: i/o timeout$`, reason); matched {
-		say = "connection_lost.mp3"
+	} else {
+		matched, err := regexp.MatchString(`^read tcp .+: i/o timeout$`, reason)
+		if err != nil {
+			log.Warnf("Regexp err: %v", err)
+		}
+
+		if matched {
+			say = "connection_lost.mp3"
+		}
 	}
 
 	playSound(say)
@@ -106,14 +113,14 @@ func monitor(tcpAddr *net.TCPAddr) {
 
 		err = bufWriter.Flush()
 		if err != nil {
-      log.Errorf("Cant flush bufWriter: %v", err)
-    }
+			log.Errorf("Cant flush bufWriter: %v", err)
+		}
 
 		log.Debugf(">%d", ts)
 		err = conn.SetReadDeadline(time.Now().Add(timeoutDuration))
 		if err != nil {
-      log.Errorf("Cant SetReadDeadline: %v", err)
-    }
+			log.Errorf("Cant SetReadDeadline: %v", err)
+		}
 
 		netData, err := bufReader.ReadString('\n')
 		if err != nil {
